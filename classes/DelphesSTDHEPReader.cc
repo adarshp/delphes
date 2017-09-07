@@ -510,7 +510,9 @@ void DelphesSTDHEPReader::AnalyzeParticles(DelphesFactory *factory,
     {
       stableParticleOutputArray->Add(candidate);
     }
-    else if(pdgCode <= 5 || pdgCode == 21 || pdgCode == 15)
+    //else if(pdgCode <= 5 || pdgCode == 21 || pdgCode == 15)  //test
+      
+    else if(pdgCode <= 6 || pdgCode == 21 || pdgCode == 15)
     {
       partonOutputArray->Add(candidate);
     }

@@ -78,16 +78,17 @@ using namespace fastjet::contrib;
 
 FastJetFinder::FastJetFinder() :
   fPlugin(0), fRecomb(0), fAxesDef(0), fMeasureDef(0), fNjettinessPlugin(0), 
-  fDefinition(0), fAreaDefinition(0), fItInputArray(0)
+  fDefinition(0), fAreaDefinition(0), fItInputArray(0), fItJetInputArray(0), fFormula(0)
 {
-
+    //test
+    fFormula = new DelphesFormula;
+    //test
 }
 
 //------------------------------------------------------------------------------
 
 FastJetFinder::~FastJetFinder()
 {
-
 }
 
 //------------------------------------------------------------------------------
@@ -100,11 +101,33 @@ void FastJetFinder::Init()
   Long_t i, size;
   Double_t etaMin, etaMax;
   TEstimatorStruct estimatorStruct;
-
+    
   // define algorithm
 
   fJetAlgorithm = GetInt("JetAlgorithm", 6);
   fParameterR = GetDouble("ParameterR", 0.5);
+    
+    fFormula->Print();
+    
+    //test
+    try
+    {
+        cout << "try test" << endl;
+        fDeltaR = GetDouble("DeltaR", 0.8);
+        cout << GetDouble("DeltaR", 0.8) << endl;
+        cout << GetString("ScaleFormula", "0.0") << endl;
+        fFormula->Compile(GetString("ScaleFormula", "0.0"));
+        fJetInputArray = ImportArray(GetString("FatJetInputArray", "FatJetEnergyScale/jets"));
+        cout << GetString("JetInputArray", "FatJetEnergyScale/jets") << endl;
+    }
+    catch(runtime_error &e)
+    {
+        fJetInputArray = 0;
+        fDeltaR = 0;
+        fFormula->Compile("0.0");
+    }
+    if(fJetInputArray) {fItJetInputArray = fJetInputArray->MakeIterator(); cout << "sure" << endl;}
+    //test
 
   fConeRadius = GetDouble("ConeRadius", 0.5);
   fSeedThreshold = GetDouble("SeedThreshold", 1.0);
@@ -116,7 +139,7 @@ void FastJetFinder::Init()
   fOverlapThreshold = GetDouble("OverlapThreshold", 0.75);
 
   fJetPTMin = GetDouble("JetPTMin", 10.0);
-
+    
   //-- N(sub)jettiness parameters --
 
   fComputeNsubjettiness = GetBool("ComputeNsubjettiness", false);
@@ -125,7 +148,7 @@ void FastJetFinder::Init()
   fRcutOff = GetDouble("RcutOff", 0.8); // used only if Njettiness is used as jet clustering algo (case 8)
   fN = GetInt("N", 2);                  // used only if Njettiness is used as jet clustering algo (case 8)
      
-  fMeasureDef = new NormalizedMeasure(fBeta, fParameterR);
+  fMeasureDef = new UnnormalizedMeasure(fBeta);
    
   switch(fAxisMode)
   {
@@ -293,6 +316,11 @@ void FastJetFinder::Finish()
   if(fNjettinessPlugin) delete static_cast<JetDefinition::Plugin*>(fNjettinessPlugin);
   if(fAxesDef) delete fAxesDef;
   if(fMeasureDef) delete fMeasureDef;
+    
+    //test
+    if(fItJetInputArray) delete fItJetInputArray;
+    if(fFormula) delete fFormula;
+    //test
 }
 
 //------------------------------------------------------------------------------
@@ -313,6 +341,12 @@ void FastJetFinder::Process()
   vector< PseudoJet >::iterator itInputList, itOutputList;
   vector< TEstimatorStruct >::iterator itEstimators;
 
+    //test
+    bool isGoodCandidate;
+    Candidate *fItJet;
+    Double_t scale;
+    //test
+    
   DelphesFactory *factory = GetFactory();
 
   inputList.clear();
@@ -325,6 +359,29 @@ void FastJetFinder::Process()
     momentum = candidate->Momentum;
     jet = PseudoJet(momentum.Px(), momentum.Py(), momentum.Pz(), momentum.E());
     jet.set_user_index(number);
+      
+      //test
+      isGoodCandidate = true;
+      if(fJetInputArray && fDeltaR)
+      {
+          scale = fFormula->Eval(momentum.Pt(), momentum.Eta(), momentum.Phi(), momentum.E());
+          if(scale > 0.0) momentum *= scale;
+          fItJetInputArray->Reset();
+          while((fItJet = static_cast<Candidate *>(fItJetInputArray->Next())))
+          {
+              cout << fItJet->BTag << endl;
+              if(fItJet->BTag!=1) continue;
+              cout << "Find a Top Jet" << endl;
+              if(fItJet->Momentum.DeltaR(momentum) <= fDeltaR)
+              {
+                  isGoodCandidate = false;
+                  break;
+              }
+          }
+      }
+      if (!isGoodCandidate) continue;
+      //test
+      
     inputList.push_back(jet);
     ++number;
   }
@@ -440,8 +497,8 @@ void FastJetFinder::Process()
 
       for (size_t i = 0; i < subjets.size() and i < 4; i++)
       {
-	    if(subjets.at(i).pt() < 0) continue ; 
- 	    candidate->TrimmedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
+        if(subjets.at(i).pt() < 0) continue ; 
+        candidate->TrimmedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
       }
     }
     
@@ -468,8 +525,8 @@ void FastJetFinder::Process()
 
       for (size_t i = 0; i < subjets.size() and i < 4; i++)
       {
-	    if(subjets.at(i).pt() < 0) continue ; 
-  	    candidate->PrunedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
+        if(subjets.at(i).pt() < 0) continue ; 
+        candidate->PrunedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
       }
 
     } 
@@ -495,8 +552,8 @@ void FastJetFinder::Process()
 
       for (size_t i = 0; i < subjets.size()  and i < 4; i++)
       {
-	    if(subjets.at(i).pt() < 0) continue ; 
-  	    candidate->SoftDroppedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
+        if(subjets.at(i).pt() < 0) continue ; 
+        candidate->SoftDroppedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
       }
     }
   
@@ -523,3 +580,4 @@ void FastJetFinder::Process()
   }
   delete sequence;
 }
+

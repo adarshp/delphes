@@ -17,7 +17,7 @@
  */
 
 
-/** \class JetFlavorAssociation
+/** \class FatFatJetFlavorAssociation
  *
  *  Find origin of jet && evaluate jet flavor
  *
@@ -25,7 +25,7 @@
  *
  */
 
-#include "modules/JetFlavorAssociation.h"
+#include "modules/FatJetFlavorAssociation.h"
 
 #include "classes/DelphesClasses.h"
 #include "classes/DelphesFactory.h"
@@ -52,11 +52,11 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 
-class PartonClassifier: public ExRootClassifier
+class PartonClassifierFat: public ExRootClassifier
 {
 public:
 
-  PartonClassifier() {}
+  PartonClassifierFat() {}
   Int_t GetCategory(TObject *object);
   Double_t fEtaMax, fPTMin;
 };
@@ -64,7 +64,7 @@ public:
 //------------------------------------------------------------------------------
 // https://cmssdt.cern.ch/SDT/lxr/source/PhysicsTools/JetMCAlgos/plugins/PartonSelector.cc
 
-Int_t PartonClassifier::GetCategory(TObject *object)
+Int_t PartonClassifierFat::GetCategory(TObject *object)
 {
  // select parton in the parton list
 
@@ -80,7 +80,12 @@ Int_t PartonClassifier::GetCategory(TObject *object)
     //cout << pdgCode << " " << parton->Status << endl;
 
   if(parton->Status == -1) return -1;
-  if(pdgCode != 21 && pdgCode > 5) return -1; // not a parton, skip
+  //if(pdgCode != 21 && pdgCode > 5) return -1; // not a parton, skip
+    
+    //
+    if(pdgCode != 21 && pdgCode > 6) return -1; // not a parton, skip
+    //
+    
   if(parton->Status == 3 || parton->Status == 2) return 0; // if status 3 return
 
   return 0;
@@ -88,16 +93,16 @@ Int_t PartonClassifier::GetCategory(TObject *object)
 
 //------------------------------------------------------------------------------
 
-class ParticleLHEFClassifier: public ExRootClassifier
+class ParticleLHEFClassifierFat: public ExRootClassifier
 {
 public:
 
-  ParticleLHEFClassifier() {}
+  ParticleLHEFClassifierFat() {}
   Int_t GetCategory(TObject *object);
   Double_t fEtaMax, fPTMin;
 };
 
-Int_t ParticleLHEFClassifier::GetCategory(TObject *object)
+Int_t ParticleLHEFClassifierFat::GetCategory(TObject *object)
 {
   // select parton in the parton list
 
@@ -118,36 +123,36 @@ Int_t ParticleLHEFClassifier::GetCategory(TObject *object)
 
 //------------------------------------------------------------------------------
 
-JetFlavorAssociation::JetFlavorAssociation() :
-  fPartonClassifier(0), fPartonFilter(0), fParticleLHEFFilter(0),
+FatJetFlavorAssociation::FatJetFlavorAssociation() :
+  fPartonClassifierFat(0), fPartonFilter(0), fParticleLHEFFilter(0),
   fItPartonInputArray(0), fItParticleInputArray(0),
   fItParticleLHEFInputArray(0), fItJetInputArray(0)
 {
-  fPartonClassifier = new PartonClassifier;
-  fParticleLHEFClassifier = new ParticleLHEFClassifier;
+  fPartonClassifierFat = new PartonClassifierFat;
+  fParticleLHEFClassifierFat = new ParticleLHEFClassifierFat;
 }
 
 //------------------------------------------------------------------------------
 
-JetFlavorAssociation::~JetFlavorAssociation()
+FatJetFlavorAssociation::~FatJetFlavorAssociation()
 {
-  if(fPartonClassifier) delete fPartonClassifier;
-  if(fParticleLHEFClassifier) delete fParticleLHEFClassifier;
+  if(fPartonClassifierFat) delete fPartonClassifierFat;
+  if(fParticleLHEFClassifierFat) delete fParticleLHEFClassifierFat;
 }
 
 //------------------------------------------------------------------------------
 
-void JetFlavorAssociation::Init()
+void FatJetFlavorAssociation::Init()
 {
   ExRootConfParam param;
 
   fDeltaR = GetDouble("DeltaR", 0.5);
 
-  fPartonClassifier->fPTMin = GetDouble("PartonPTMin", 0.0);
-  fPartonClassifier->fEtaMax = GetDouble("PartonEtaMax", 2.5);
+  fPartonClassifierFat->fPTMin = GetDouble("PartonPTMin", 0.0);
+  fPartonClassifierFat->fEtaMax = GetDouble("PartonEtaMax", 2.5);
 
-  fParticleLHEFClassifier->fPTMin = GetDouble("PartonPTMin", 0.0);
-  fParticleLHEFClassifier->fEtaMax = GetDouble("PartonEtaMax", 2.5);
+  fParticleLHEFClassifierFat->fPTMin = GetDouble("PartonPTMin", 0.0);
+  fParticleLHEFClassifierFat->fEtaMax = GetDouble("PartonEtaMax", 2.5);
 
   // import input array(s)
   fPartonInputArray = ImportArray(GetString("PartonInputArray", "Delphes/partons"));
@@ -184,7 +189,7 @@ void JetFlavorAssociation::Init()
 
 //------------------------------------------------------------------------------
 
-void JetFlavorAssociation::Finish()
+void FatJetFlavorAssociation::Finish()
 {
   if(fPartonFilter) delete fPartonFilter;
   if(fParticleLHEFFilter) delete fParticleLHEFFilter;
@@ -197,7 +202,7 @@ void JetFlavorAssociation::Finish()
 
 //------------------------------------------------------------------------------
 
-void JetFlavorAssociation::Process(){
+void FatJetFlavorAssociation::Process(){
     
     //test
     cout << myname << endl;
@@ -222,7 +227,7 @@ void JetFlavorAssociation::Process(){
 
   // select quark and gluons
   fPartonFilter->Reset();
-  partonArray = fPartonFilter->GetSubArray(fPartonClassifier, 0); // get the filtered parton array
+  partonArray = fPartonFilter->GetSubArray(fPartonClassifierFat, 0); // get the filtered parton array
     
     /*//test
     {TIterator *fItParton;
@@ -248,7 +253,7 @@ void JetFlavorAssociation::Process(){
   if(fParticleLHEFInputArray)
   {
     fParticleLHEFFilter->Reset();
-    partonLHEFArray = fParticleLHEFFilter->GetSubArray(fParticleLHEFClassifier, 0); // get the filtered parton array
+    partonLHEFArray = fParticleLHEFFilter->GetSubArray(fParticleLHEFClassifierFat, 0); // get the filtered parton array
       
       /*//test
       test=1;
@@ -295,7 +300,7 @@ void JetFlavorAssociation::Process(){
 // Standard definition of jet flavor in
 // https://cmssdt.cern.ch/SDT/lxr/source/PhysicsTools/JetMCAlgos/plugins/JetPartonMatcher.cc?v=CMSSW_7_3_0_pre1
 
-void JetFlavorAssociation::GetAlgoFlavor(Candidate *jet, TObjArray *partonArray, TObjArray *partonLHEFArray)
+void FatJetFlavorAssociation::GetAlgoFlavor(Candidate *jet, TObjArray *partonArray, TObjArray *partonLHEFArray)
 {
   float maxPt = 0;
   int daughterCounter = 0;
@@ -377,7 +382,7 @@ void JetFlavorAssociation::GetAlgoFlavor(Candidate *jet, TObjArray *partonArray,
 
 //------------------------------------------------------------------------------
 
-void JetFlavorAssociation::GetPhysicsFlavor(Candidate *jet, TObjArray *partonArray, TObjArray *partonLHEFArray)
+void FatJetFlavorAssociation::GetPhysicsFlavor(Candidate *jet, TObjArray *partonArray, TObjArray *partonLHEFArray)
 {
   int partonCounter = 0;
   float biggerConeSize = 0.7;

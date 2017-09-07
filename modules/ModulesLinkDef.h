@@ -38,7 +38,6 @@
 #include "modules/ImpactParameterSmearing.h"
 #include "modules/TimeSmearing.h"
 #include "modules/SimpleCalorimeter.h"
-#include "modules/DenseTrackFilter.h"
 #include "modules/Calorimeter.h"
 #include "modules/OldCalorimeter.h"
 #include "modules/Isolation.h"
@@ -65,6 +64,10 @@
 #include "modules/Weighter.h"
 #include "modules/Hector.h"
 #include "modules/JetFlavorAssociation.h"
+//test
+#include "modules/FatJetFlavorAssociation.h"
+#include "modules/FTTagging.h"
+//test
 #include "modules/JetFakeParticle.h"
 #include "modules/VertexSorter.h"
 #include "modules/VertexFinder.h"
@@ -90,7 +93,6 @@
 #pragma link C++ class ImpactParameterSmearing+;
 #pragma link C++ class TimeSmearing+;
 #pragma link C++ class SimpleCalorimeter+;
-#pragma link C++ class DenseTrackFilter+;
 #pragma link C++ class Calorimeter+;
 #pragma link C++ class OldCalorimeter+;
 #pragma link C++ class Isolation+;
@@ -117,6 +119,10 @@
 #pragma link C++ class Weighter+;
 #pragma link C++ class Hector+;
 #pragma link C++ class JetFlavorAssociation+;
+//test
+#pragma link C++ class FatJetFlavorAssociation+;
+#pragma link C++ class FTTagging+;
+//test
 #pragma link C++ class JetFakeParticle+;
 #pragma link C++ class VertexSorter+;
 #pragma link C++ class VertexFinder+;

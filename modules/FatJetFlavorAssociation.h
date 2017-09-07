@@ -16,10 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef JetFlavorAssociation_h
-#define JetFlavorAssociation_h
+#ifndef FatJetFlavorAssociation_h
+#define FatJetFlavorAssociation_h
 
-/** \class JetFlavorAssociation
+/** \class FatJetFlavorAssociation
  *
  *  Find origin of jet and evaluate jet flavor
  *
@@ -39,15 +39,15 @@ class TObjArray;
 class DelphesFormula;
 
 class ExRootFilter;
-class PartonClassifier;
-class ParticleLHEFClassifier;
+class PartonClassifierFat;
+class ParticleLHEFClassifierFat;
 
-class JetFlavorAssociation: public DelphesModule
+class FatJetFlavorAssociation: public DelphesModule
 {
 public:
 
-  JetFlavorAssociation();
-  ~JetFlavorAssociation();
+  FatJetFlavorAssociation();
+  ~FatJetFlavorAssociation();
 
   void Init();
   void Process();
@@ -64,8 +64,8 @@ private:
     std::string myname;
     //test
 
-  PartonClassifier *fPartonClassifier; //!
-  ParticleLHEFClassifier *fParticleLHEFClassifier; //!
+  PartonClassifierFat *fPartonClassifierFat; //!
+  ParticleLHEFClassifierFat *fParticleLHEFClassifierFat; //!
 
   ExRootFilter *fPartonFilter;
   ExRootFilter *fParticleLHEFFilter;
@@ -80,7 +80,7 @@ private:
   const TObjArray *fParticleLHEFInputArray; //!
   const TObjArray *fJetInputArray; //!
 
-  ClassDef(JetFlavorAssociation, 1)
+  ClassDef(FatJetFlavorAssociation, 1)
 };
 
 #endif

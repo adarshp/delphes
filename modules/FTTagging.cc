@@ -17,7 +17,7 @@
  */
 
 
-/** \class BTagging
+/** \class FTTagging
  *
  *  Determines origin of jet,
  *  applies b-tagging efficiency (miss identification rate) formulas
@@ -27,7 +27,7 @@
  *
  */
 
-#include "modules/BTagging.h"
+#include "modules/FTTagging.h"
 
 #include "classes/DelphesClasses.h"
 #include "classes/DelphesFactory.h"
@@ -48,24 +48,24 @@
 
 using namespace std;
 
-int i=1;
+int j=1;
 
 //------------------------------------------------------------------------------
 
-BTagging::BTagging() :
+FTTagging::FTTagging() :
   fItJetInputArray(0)
 {
 }
 
 //------------------------------------------------------------------------------
 
-BTagging::~BTagging()
+FTTagging::~FTTagging()
 {
 }
 
 //------------------------------------------------------------------------------
 
-void BTagging::Init()
+void FTTagging::Init()
 {
   map< Int_t, DelphesFormula * >::iterator itEfficiencyMap;
   ExRootConfParam param;
@@ -111,7 +111,7 @@ void BTagging::Init()
 
 //------------------------------------------------------------------------------
 
-void BTagging::Finish()
+void FTTagging::Finish()
 {
   map< Int_t, DelphesFormula * >::iterator itEfficiencyMap;
   DelphesFormula *formula;
@@ -127,12 +127,12 @@ void BTagging::Finish()
 
 //------------------------------------------------------------------------------
 
-void BTagging::Process()
+void FTTagging::Process()
 {
     
     //test
-    if (myname=="JetEnergyScale/jets")
-        cout << "BTagging Start" << endl;
+    if (myname=="FatJetEnergyScale/jets")
+        cout << "TTagging Start" << endl;
     //test
     
   Candidate *jet;
@@ -143,7 +143,7 @@ void BTagging::Process()
     //test
     Int_t test;
     static int top=0, bottom=0;
-    //cout << "BTagging Start" << endl;
+    //cout << "FTTagging Start" << endl;
     //test
 
   // loop over all input jets
@@ -160,7 +160,7 @@ void BTagging::Process()
       //test
       std::cout << "#---------------------------------Before---------------------------------------" << endl;
       std::cout << "i" << " " << "eta" << " " << "phi" << " " << "pt" << " " << "e" << " " << "Flavor" << " " << "FlavorAlgo" << " " << "FlavorPhys" << " " << "BTag" << endl;
-      std::cout << i << " " << eta << " " << phi << " " << pt << " " << e << " " << jet->Flavor << " " << jet->FlavorAlgo << " " << jet->FlavorPhys << " " << jet->BTag << endl;
+      std::cout << j << " " << eta << " " << phi << " " << pt << " " << e << " " << jet->Flavor << " " << jet->FlavorAlgo << " " << jet->FlavorPhys << " " << jet->BTag << endl;
       //test
 
     // find an efficiency formula
@@ -183,8 +183,8 @@ void BTagging::Process()
       if (jet->Flavor==6) top++;
       if (jet->Flavor==5) bottom++;
       std::cout << "#----------------------------------After----------------------------------------" << endl;
-      std::cout << i << " " << eta << " " << phi << " " << pt << " " << e << " " << jet->Flavor << " " << jet->FlavorAlgo << " " << jet->FlavorPhys << " " << jet->BTag << endl;
-      i++;
+      std::cout << j << " " << eta << " " << phi << " " << pt << " " << e << " " << jet->Flavor << " " << jet->FlavorAlgo << " " << jet->FlavorPhys << " " << jet->BTag << endl;
+      j++;
       //test
        
     // find an efficiency formula for algo flavor definition
@@ -213,12 +213,12 @@ void BTagging::Process()
     /*//test
     cout << "top bottom" << endl;
     cout << top << " " << bottom << endl;
-    cout << "BTagging End" << endl;
+    cout << "FTTagging End" << endl;
     //test*/
     
     //test
-    if (myname=="JetEnergyScale/jets")
-        cout << "BTagging End" << endl;
+    if (myname=="FatJetEnergyScale/jets")
+        cout << "TTagging End" << endl;
     //test
     
 }

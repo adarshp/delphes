@@ -33,6 +33,10 @@
 
 #include <map>
 
+//test
+#include <string>
+//test
+
 class TObjArray;
 class DelphesFormula;
 
@@ -50,6 +54,10 @@ public:
 private:
 
   Int_t fBitNumber;
+    
+    //test
+    std::string myname;
+    //test
 
 #if !defined(__CINT__) && !defined(__CLING__)
   std::map< Int_t, DelphesFormula * > fEfficiencyMap; //!
@@ -63,3 +71,4 @@ private:
 };
 
 #endif
+

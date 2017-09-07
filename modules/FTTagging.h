@@ -16,33 +16,58 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef FTTagging_h
+#define FTTagging_h
 
-/** \class
+/** \class FTTagging
  *
- *  Lists classes to be included in cint dicitonary
+ *  Determines origin of jet,
+ *  applies b-tagging efficiency (miss identification rate) formulas
+ *  and sets b-tagging flags 
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
  *
  */
 
-#include "modules/FastJetFinder.h"
-#include "modules/FastJetGridMedianEstimator.h"
-#include "modules/RunPUPPI.h"
+#include "classes/DelphesModule.h"
+
+#include <map>
+
 //test
-//#include "modules/FatJetFinder.h"
+#include <string>
 //test
 
-#ifdef __CINT__
+class TObjArray;
+class DelphesFormula;
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+class FTTagging: public DelphesModule
+{
+public:
 
-#pragma link C++ class FastJetFinder+;
-#pragma link C++ class FastJetGridMedianEstimator+;
-#pragma link C++ class RunPUPPI+;
-//test
-//#pragma link C++ class FatJetFinder+;
-//test
+  FTTagging();
+  ~FTTagging();
+
+  void Init();
+  void Process();
+  void Finish();
+
+private:
+
+  Int_t fBitNumber;
+    
+    //test
+    std::string myname;
+    //test
+
+#if !defined(__CINT__) && !defined(__CLING__)
+  std::map< Int_t, DelphesFormula * > fEfficiencyMap; //!
+#endif
+
+  TIterator *fItJetInputArray; //!
+  
+  const TObjArray *fJetInputArray; //!
+
+  ClassDef(FTTagging, 1)
+};
 
 #endif

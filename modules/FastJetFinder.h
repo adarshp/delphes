@@ -34,6 +34,10 @@
 class TObjArray;
 class TIterator;
 
+//test
+class DelphesFormula;
+//test
+
 namespace fastjet {
   class JetDefinition;
   class AreaDefinition;
@@ -75,6 +79,14 @@ private:
   Int_t fIratch;
   Int_t fAdjacencyCut;
   Double_t fOverlapThreshold;
+    
+    //test
+    DelphesFormula *fFormula;
+    
+    Double_t fDeltaR;
+    TIterator *fItJetInputArray;
+    TObjArray *fJetInputArray;
+    //test
 
   //-- N (sub)jettiness parameters --
 
@@ -144,3 +156,4 @@ private:
 };
 
 #endif
+
