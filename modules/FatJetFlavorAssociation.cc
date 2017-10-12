@@ -80,12 +80,7 @@ Int_t PartonClassifierFat::GetCategory(TObject *object)
     //cout << pdgCode << " " << parton->Status << endl;
 
   if(parton->Status == -1) return -1;
-  //if(pdgCode != 21 && pdgCode > 5) return -1; // not a parton, skip
-    
-    //
-    if(pdgCode != 21 && pdgCode > 6) return -1; // not a parton, skip
-    //
-    
+  if(pdgCode != 21 && pdgCode > 6) return -1; // not a parton, skip
   if(parton->Status == 3 || parton->Status == 2) return 0; // if status 3 return
 
   return 0;
@@ -307,7 +302,7 @@ void FatJetFlavorAssociation::GetAlgoFlavor(Candidate *jet, TObjArray *partonArr
   Candidate *parton, *partonLHEF;
   Candidate *tempParton = 0, *tempPartonHighestPt = 0;
   int pdgCode, pdgCodeMax = -1;
-  
+    
   TIter itPartonArray(partonArray);
   TIter itPartonLHEFArray(partonLHEFArray);
 
@@ -319,7 +314,7 @@ void FatJetFlavorAssociation::GetAlgoFlavor(Candidate *jet, TObjArray *partonArr
     if(TMath::Abs(parton->PID) == 21) pdgCode = 0;
     if(jet->Momentum.DeltaR(parton->Momentum) <= fDeltaR)
     {
-      if(pdgCodeMax < pdgCode) pdgCodeMax = pdgCode;
+        if(pdgCodeMax < pdgCode) pdgCodeMax = pdgCode;
     }
  
     if(!fParticleLHEFInputArray) continue;
@@ -377,7 +372,7 @@ void FatJetFlavorAssociation::GetAlgoFlavor(Candidate *jet, TObjArray *partonArr
     {cout << " " << jet->PID << " " << jet->Status << " " << jet->Mass << " " << jet->Flavor << " " << jet->IsConstituent << endl;
     cout << "####################Jet####################" << endl;}
     //test*/
-
+    
 }
 
 //------------------------------------------------------------------------------
@@ -479,4 +474,3 @@ void FatJetFlavorAssociation::GetPhysicsFlavor(Candidate *jet, TObjArray *parton
     }
   }
 }
-

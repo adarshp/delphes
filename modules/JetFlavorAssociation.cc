@@ -474,4 +474,3 @@ void JetFlavorAssociation::GetPhysicsFlavor(Candidate *jet, TObjArray *partonArr
     }
   }
 }
-

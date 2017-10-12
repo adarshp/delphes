@@ -63,9 +63,13 @@ private:
   std::map< Int_t, DelphesFormula * > fEfficiencyMap; //!
 #endif
 
-  TIterator *fItJetInputArray; //!
+  TIterator *fItFatJetInputArray; //!
   
-  const TObjArray *fJetInputArray; //!
+  const TObjArray *fFatJetInputArray; //!
+    
+    TObjArray *fParticleArray; //!
+    TIterator *fItParticleArray; //!
+    double fjDeltaR;
 
   ClassDef(FTTagging, 1)
 };

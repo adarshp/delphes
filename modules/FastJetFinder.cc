@@ -113,11 +113,11 @@ void FastJetFinder::Init()
     try
     {
         cout << "try test" << endl;
-        fDeltaR = GetDouble("DeltaR", 0.8);
-        cout << GetDouble("DeltaR", 0.8) << endl;
+        fDeltaR = GetDouble("DeltaR", 1.0);
+        cout << fDeltaR << endl;
         cout << GetString("ScaleFormula", "0.0") << endl;
         fFormula->Compile(GetString("ScaleFormula", "0.0"));
-        fJetInputArray = ImportArray(GetString("FatJetInputArray", "FatJetEnergyScale/jets"));
+        fJetInputArray = ImportArray(GetString("JetInputArray", "FatJetEnergyScale/jets"));
         cout << GetString("JetInputArray", "FatJetEnergyScale/jets") << endl;
     }
     catch(runtime_error &e)
@@ -497,8 +497,8 @@ void FastJetFinder::Process()
 
       for (size_t i = 0; i < subjets.size() and i < 4; i++)
       {
-        if(subjets.at(i).pt() < 0) continue ; 
-        candidate->TrimmedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
+	    if(subjets.at(i).pt() < 0) continue ; 
+ 	    candidate->TrimmedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
       }
     }
     
@@ -525,8 +525,8 @@ void FastJetFinder::Process()
 
       for (size_t i = 0; i < subjets.size() and i < 4; i++)
       {
-        if(subjets.at(i).pt() < 0) continue ; 
-        candidate->PrunedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
+	    if(subjets.at(i).pt() < 0) continue ; 
+  	    candidate->PrunedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
       }
 
     } 
@@ -552,8 +552,8 @@ void FastJetFinder::Process()
 
       for (size_t i = 0; i < subjets.size()  and i < 4; i++)
       {
-        if(subjets.at(i).pt() < 0) continue ; 
-        candidate->SoftDroppedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
+	    if(subjets.at(i).pt() < 0) continue ; 
+  	    candidate->SoftDroppedP4[i+1].SetPtEtaPhiM(subjets.at(i).pt(), subjets.at(i).eta(), subjets.at(i).phi(), subjets.at(i).m());
       }
     }
   
@@ -580,4 +580,3 @@ void FastJetFinder::Process()
   }
   delete sequence;
 }
-

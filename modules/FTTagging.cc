@@ -53,7 +53,7 @@ int j=1;
 //------------------------------------------------------------------------------
 
 FTTagging::FTTagging() :
-  fItJetInputArray(0)
+  fItFatJetInputArray(0), fItParticleArray(0)
 {
 }
 
@@ -99,11 +99,17 @@ void FTTagging::Init()
 
   // import input array(s)
 
-  fJetInputArray = ImportArray(GetString("JetInputArray", "FastJetFinder/jets"));
-  fItJetInputArray = fJetInputArray->MakeIterator();
+  fFatJetInputArray = ImportArray(GetString("FatJetInputArray", "FatJetFinder/jets"));
+  fItFatJetInputArray = fFatJetInputArray->MakeIterator();
+    
+    
+    fParticleArray = ImportArray(GetString("ParticleArray", "Delphes/allParticles"));
+    fItParticleArray = fParticleArray->MakeIterator();
+    fjDeltaR = GetDouble("JetDeltaR", 1.5);
+    
     
     //test
-    myname=GetString("JetInputArray", "FastJetFinder/jets");
+    myname=GetString("JetInputArray", "FatJetFinder/jets");
     cout << myname << endl;
     //test
 
@@ -116,13 +122,17 @@ void FTTagging::Finish()
   map< Int_t, DelphesFormula * >::iterator itEfficiencyMap;
   DelphesFormula *formula;
 
-  if(fItJetInputArray) delete fItJetInputArray;
+  if(fItFatJetInputArray) delete fItFatJetInputArray;
 
   for(itEfficiencyMap = fEfficiencyMap.begin(); itEfficiencyMap != fEfficiencyMap.end(); ++itEfficiencyMap)
   {
     formula = itEfficiencyMap->second;
     if(formula) delete formula;
   }
+    
+    //if(fParticleArray) delete fParticleArray;
+    if(fItParticleArray) delete fItParticleArray;
+    
 }
 
 //------------------------------------------------------------------------------
@@ -135,7 +145,10 @@ void FTTagging::Process()
         cout << "TTagging Start" << endl;
     //test
     
-  Candidate *jet;
+  Candidate *jet, *particle;
+    
+    bool isGoodTopJet;
+    
   Double_t pt, eta, phi, e;
   map< Int_t, DelphesFormula * >::iterator itEfficiencyMap;
   DelphesFormula *formula;
@@ -147,9 +160,29 @@ void FTTagging::Process()
     //test
 
   // loop over all input jets
-  fItJetInputArray->Reset();
-  while((jet = static_cast<Candidate*>(fItJetInputArray->Next())))
+  fItFatJetInputArray->Reset();
+  while((jet = static_cast<Candidate*>(fItFatJetInputArray->Next())))
   {
+      
+      isGoodTopJet = true;
+      fItParticleArray->Reset();
+      
+      
+      while((particle = static_cast<Candidate *>(fItParticleArray->Next())))
+      {
+          if(particle->Status!=3) continue;
+          if(!((TMath::Abs(particle->PID)==11)or(TMath::Abs(particle->PID)==13))) continue;
+          cout << "particle ID:" << particle->PID << endl;
+          if(jet->Momentum.DeltaR(particle->Momentum) <= fjDeltaR)
+          {
+              isGoodTopJet = false;
+              break;
+          }
+      }
+
+      
+      if(!isGoodTopJet) continue;
+      
     const TLorentzVector &jetMomentum = jet->Momentum;
     eta = jetMomentum.Eta();
     phi = jetMomentum.Phi();
@@ -157,11 +190,11 @@ void FTTagging::Process()
     e = jetMomentum.E();
       
       
-      //test
+      /*//test
       std::cout << "#---------------------------------Before---------------------------------------" << endl;
       std::cout << "i" << " " << "eta" << " " << "phi" << " " << "pt" << " " << "e" << " " << "Flavor" << " " << "FlavorAlgo" << " " << "FlavorPhys" << " " << "BTag" << endl;
       std::cout << j << " " << eta << " " << phi << " " << pt << " " << e << " " << jet->Flavor << " " << jet->FlavorAlgo << " " << jet->FlavorPhys << " " << jet->BTag << endl;
-      //test
+      //test*/
 
     // find an efficiency formula
     itEfficiencyMap = fEfficiencyMap.find(jet->Flavor);
@@ -179,13 +212,13 @@ void FTTagging::Process()
     // apply an efficiency formula
     jet->BTag |= (gRandom->Uniform() <= formula->Eval(pt, eta, phi, e)) << fBitNumber;
       
-      //test
+      /*//test
       if (jet->Flavor==6) top++;
       if (jet->Flavor==5) bottom++;
       std::cout << "#----------------------------------After----------------------------------------" << endl;
       std::cout << j << " " << eta << " " << phi << " " << pt << " " << e << " " << jet->Flavor << " " << jet->FlavorAlgo << " " << jet->FlavorPhys << " " << jet->BTag << endl;
       j++;
-      //test
+      //test*/
        
     // find an efficiency formula for algo flavor definition
     itEfficiencyMap = fEfficiencyMap.find(jet->FlavorAlgo);
@@ -224,4 +257,3 @@ void FTTagging::Process()
 }
 
 //------------------------------------------------------------------------------
-
